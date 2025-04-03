@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Online Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- 中英切换开关 -->
+    <label class="switch">
+      <input type="checkbox" id="languageToggle" onchange="toggleLanguage()">
+      <span class="slider"></span>
+    </label>
+    <p class="toggle-label">English / 中文</p>
+
+    <!-- === 英文版界面 === -->
+    <div id="english-calculator">
+      <h1>Online Calculator</h1>
+      <!-- 基础运算：加减乘除 -->
+      <input type="number" id="num1" placeholder="Enter first number" />
+      <input type="number" id="num2" placeholder="Enter second number" />
+      <br />
+      <button onclick="calculate('add')">Addition</button>
+      <button onclick="calculate('subtract')">Subtraction</button>
+      <button onclick="calculate('multiply')">Multiplication</button>
+      <button onclick="calculate('divide')">Division</button>
+      <h2>Result: <span id="result">-</span></h2>
+
+      <hr />
+
+      <!-- 高级运算：幂 & 取模（需要两个数），以及平方根（需要一个数） -->
+      <h3>Advanced Operations</h3>
+      <input type="number" id="advNum1" placeholder="Base / first number" />
+      <input type="number" id="advNum2" placeholder="Exponent / second number" />
+      <br />
+      <button onclick="calculateAdvanced('power')">Power</button>
+      <button onclick="calculateAdvanced('mod')">Modulo</button>
+
+      <br /><br />
+      <input type="number" id="sqrtVal" placeholder="Number for sqrt" />
+      <button onclick="calculateSqrt()">Square Root</button>
+      <h2>Advanced Result: <span id="advResult">-</span></h2>
+    </div>
+
+    <!-- === 中文版界面 === -->
+    <div id="chinese-calculator" style="display: none;">
+      <h1>在线计算器</h1>
+      <!-- 基础运算：加减乘除 -->
+      <input type="number" id="num1-cn" placeholder="输入第一个数字" />
+      <input type="number" id="num2-cn" placeholder="输入第二个数字" />
+      <br />
+      <button onclick="calculateCn('add')">加法</button>
+      <button onclick="calculateCn('subtract')">减法</button>
+      <button onclick="calculateCn('multiply')">乘法</button>
+      <button onclick="calculateCn('divide')">除法</button>
+      <h2>结果: <span id="result-cn">-</span></h2>
+
+      <hr />
+
+      <!-- 高级运算：幂 & 取模 & 平方根 -->
+      <h3>高级运算</h3>
+      <input type="number" id="advNum1-cn" placeholder="底数/第一个数字" />
+      <input type="number" id="advNum2-cn" placeholder="指数/第二个数字" />
+      <br />
+      <button onclick="calculateAdvancedCn('power')">幂运算</button>
+      <button onclick="calculateAdvancedCn('mod')">取模</button>
+
+      <br /><br />
+      <input type="number" id="sqrtVal-cn" placeholder="需要开根的数字" />
+      <button onclick="calculateSqrtCn()">平方根</button>
+      <h2>结果: <span id="advResult-cn">-</span></h2>
+    </div>
+  </div>
+
+  <script>
+    // ==================
+    //   中英界面切换
+    // ==================
+    function toggleLanguage() {
+      const isChecked = document.getElementById("languageToggle").checked;
+      if (isChecked) {
+        document.getElementById("english-calculator").style.display = "none";
+        document.getElementById("chinese-calculator").style.display = "block";
+      } else {
+        document.getElementById("english-calculator").style.display = "block";
+        document.getElementById("chinese-calculator").style.display = "none";
+      }
+    }
+
+    // ==================
+    //   英文版: 基础运算
+    // ==================
+    function calculate(operation) {
+      const num1 = document.getElementById('num1').value;
+      const num2 = document.getElementById('num2').value;
+      fetch(`/${operation}?num1=${num1}&num2=${num2}`)
+        .then(response => response.json())
+        .then(data => {
+          // 如果服务器返回错误信息，就显示错误，否则显示计算结果
+          if (data.error) {
+            document.getElementById('result').innerText = data.error;
+          } else {
+            document.getElementById('result').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('result').innerText = 'Error');
+    }
+
+    // ==================
+    //   中文版: 基础运算
+    // ==================
+    function calculateCn(operation) {
+      const num1 = document.getElementById('num1-cn').value;
+      const num2 = document.getElementById('num2-cn').value;
+      fetch(`/${operation}?num1=${num1}&num2=${num2}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('result-cn').innerText = data.error;
+          } else {
+            document.getElementById('result-cn').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('result-cn').innerText = '错误');
+    }
+
+    // ==================
+    //  英文版: 高级运算
+    // ==================
+    function calculateAdvanced(operation) {
+      const num1 = document.getElementById('advNum1').value;
+      const num2 = document.getElementById('advNum2').value;
+      fetch(`/${operation}?num1=${num1}&num2=${num2}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('advResult').innerText = data.error;
+          } else {
+            document.getElementById('advResult').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('advResult').innerText = 'Error');
+    }
+
+    function calculateSqrt() {
+      const num = document.getElementById('sqrtVal').value;
+      fetch(`/sqrt?num=${num}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('advResult').innerText = data.error;
+          } else {
+            document.getElementById('advResult').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('advResult').innerText = 'Error');
+    }
+
+    // ==================
+    //  中文版: 高级运算
+    // ==================
+    function calculateAdvancedCn(operation) {
+      const num1 = document.getElementById('advNum1-cn').value;
+      const num2 = document.getElementById('advNum2-cn').value;
+      fetch(`/${operation}?num1=${num1}&num2=${num2}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('advResult-cn').innerText = data.error;
+          } else {
+            document.getElementById('advResult-cn').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('advResult-cn').innerText = '错误');
+    }
+
+    function calculateSqrtCn() {
+      const num = document.getElementById('sqrtVal-cn').value;
+      fetch(`/sqrt?num=${num}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('advResult-cn').innerText = data.error;
+          } else {
+            document.getElementById('advResult-cn').innerText = data.result;
+          }
+        })
+        .catch(() => document.getElementById('advResult-cn').innerText = '错误');
+    }
+  </script>
+</body>
+</html>
